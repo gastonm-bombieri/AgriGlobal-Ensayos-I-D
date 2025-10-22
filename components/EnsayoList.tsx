@@ -36,9 +36,6 @@ const EnsayoList: React.FC<EnsayoListProps> = ({ ensayos, onSelectEnsayo }) => {
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Localidad</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Cultivo</th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                  <th scope="col" className="relative px-6 py-3">
-                    <span className="sr-only">Ver</span>
-                  </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -56,9 +53,6 @@ const EnsayoList: React.FC<EnsayoListProps> = ({ ensayos, onSelectEnsayo }) => {
                       <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(ensayo.Estado)}`}>
                         {ensayo.Estado}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" className="text-[#53a65e] hover:text-[#153f38]">Ver</a>
                     </td>
                   </tr>
                 ))}

@@ -4,6 +4,7 @@ import { useEnsayos } from '../context/EnsayosContext';
 import { Ensayo } from '../types';
 import EnsayoList from './EnsayoList';
 import { SyncIcon, PlusIcon, SearchIcon, ExportIcon } from './Icons';
+import { ESTADOS, PROVINCIAS } from '../constants';
 
 interface DashboardProps {
   onSelectEnsayo: (ensayo: Ensayo) => void;
@@ -13,19 +14,33 @@ interface DashboardProps {
 const Dashboard: React.FC<DashboardProps> = ({ onSelectEnsayo, onNewEnsayo }) => {
   const { ensayos, simulateSync } = useEnsayos();
   const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [provinceFilter, setProvinceFilter] = useState('all');
+  const [yearFilter, setYearFilter] = useState('all');
 
   const unsyncedCount = useMemo(() => ensayos.filter(e => !e.synced).length, [ensayos]);
+  
+  const uniqueYears = useMemo(() => {
+    const years = new Set(ensayos.map(e => e.Año));
+    return Array.from(years).sort((a, b) => b - a);
+  }, [ensayos]);
 
   const filteredEnsayos = useMemo(() => {
-    if (!searchTerm) return ensayos;
-    const lowercasedFilter = searchTerm.toLowerCase();
-    return ensayos.filter(ensayo =>
-      ensayo.ID_Ensayo.toLowerCase().includes(lowercasedFilter) ||
-      ensayo.Localidad.toLowerCase().includes(lowercasedFilter) ||
-      ensayo.Cultivo.toLowerCase().includes(lowercasedFilter) ||
-      ensayo.Responsable.toLowerCase().includes(lowercasedFilter)
-    );
-  }, [ensayos, searchTerm]);
+    return ensayos
+      .filter(ensayo => statusFilter === 'all' || ensayo.Estado === statusFilter)
+      .filter(ensayo => provinceFilter === 'all' || ensayo.Provincia === provinceFilter)
+      .filter(ensayo => yearFilter === 'all' || ensayo.Año === parseInt(yearFilter, 10))
+      .filter(ensayo => {
+        if (!searchTerm) return true;
+        const lowercasedFilter = searchTerm.toLowerCase();
+        return (
+          ensayo.ID_Ensayo.toLowerCase().includes(lowercasedFilter) ||
+          ensayo.Localidad.toLowerCase().includes(lowercasedFilter) ||
+          ensayo.Cultivo.toLowerCase().includes(lowercasedFilter) ||
+          ensayo.Responsable.toLowerCase().includes(lowercasedFilter)
+        );
+      });
+  }, [ensayos, searchTerm, statusFilter, provinceFilter, yearFilter]);
 
   const ensayosEnCurso = useMemo(() => {
       return ensayos.filter(e => e.Estado === 'En Curso').slice(0, 5);
@@ -135,6 +150,47 @@ const Dashboard: React.FC<DashboardProps> = ({ onSelectEnsayo, onNewEnsayo }) =>
       <div className="bg-white p-6 rounded-lg shadow">
         <h3 className="text-lg font-medium leading-6 text-gray-900">Todos los Ensayos</h3>
         <div className="mt-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div>
+              <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700">Estado</label>
+              <select
+                id="status-filter"
+                name="status-filter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#53a65e] focus:border-[#53a65e] sm:text-sm rounded-md"
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+              >
+                <option value="all">Todos</option>
+                {ESTADOS.map(status => <option key={status} value={status}>{status}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="province-filter" className="block text-sm font-medium text-gray-700">Provincia</label>
+              <select
+                id="province-filter"
+                name="province-filter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#53a65e] focus:border-[#53a65e] sm:text-sm rounded-md"
+                value={provinceFilter}
+                onChange={e => setProvinceFilter(e.target.value)}
+              >
+                <option value="all">Todas</option>
+                {PROVINCIAS.map(province => <option key={province} value={province}>{province}</option>)}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="year-filter" className="block text-sm font-medium text-gray-700">Año</label>
+              <select
+                id="year-filter"
+                name="year-filter"
+                className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-[#53a65e] focus:border-[#53a65e] sm:text-sm rounded-md"
+                value={yearFilter}
+                onChange={e => setYearFilter(e.target.value)}
+              >
+                <option value="all">Todos</option>
+                {uniqueYears.map(year => <option key={year} value={year}>{year}</option>)}
+              </select>
+            </div>
+          </div>
           <div className="relative rounded-md shadow-sm mb-4">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <SearchIcon className="h-5 w-5 text-gray-400" />
