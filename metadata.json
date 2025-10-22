@@ -1,0 +1,8 @@
+{
+  "name": "AgriGlobal - Gestión de Ensayos I+D",
+  "description": "A robust, mobile-first web application to digitize, standardize, and centralize the data collection of agricultural field trials, replacing scattered spreadsheets and improving data integrity.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
